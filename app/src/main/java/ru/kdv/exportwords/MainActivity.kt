@@ -54,18 +54,25 @@ class MainActivity : AppCompatActivity() {
                         SQLiteDatabase.OPEN_READWRITE
                 )
 
-                var c = db.rawQuery("""
+                var textQ = """
                     select 
                     ifnull(B.question_ru,"") as question_ru,
                     ifnull(B.question_en,"") as question_en,
                     ifnull(B.sentence_ru,"") as sentence_ru,
-                    ifnull(B.sentence_en,"") as sentence_en
+                    ifnull(B.sentence_en,"") as sentence_en,
+                    ifnull(transcription,"") as trans
                     from WordsTable as T
                     left join BaseWordsTable as B
                     on T.id_word = B.id_word
-                    where T.is_known = 0
+                    where T.is_known = 0 and B.id_word is not null
                     order by date_learned
-                        """, null)
+                        """;
+
+                if(checkBox.isChecked){
+                    textQ = textQ.replace("T.is_known = 0 and","");
+                }
+
+                var c = db.rawQuery(textQ, null)
                 Toast.makeText(this,  c.getCount().toString() + " words", Toast.LENGTH_LONG).show()
                 Log.d("db", c.getCount().toString())
                 var str=""
