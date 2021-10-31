@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d("db", c.getCount().toString())
                 var str=""
                 while(c.moveToNext()) {
-                    str += c.getString(c.getColumnIndex("question_ru")) + ";" + c.getString(c.getColumnIndex("question_en")) + ";" + c.getString(c.getColumnIndex("sentence_ru")) + ";" + c.getString(c.getColumnIndex("sentence_en")) + "\n"
+                    str += c.getString(c.getColumnIndex("question_ru")) + ";" + c.getString(c.getColumnIndex("question_en")) + ";" + c.getString(c.getColumnIndex("sentence_ru")) + ";" + c.getString(c.getColumnIndex("sentence_en"))+ ";" + c.getString(c.getColumnIndex("trans")) + "\n"
                 }
                 var f = File(fn)
                 f.writeText(str)
@@ -91,5 +91,25 @@ class MainActivity : AppCompatActivity() {
             Log.e("1", e.toString())
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
         }
+    }
+
+    fun onClickFromSmartBook(view: View) {
+        var ExDir = externalMediaDirs[0].toString()
+        var dic = ExDir + File.separator + "smart-book.txt"
+        var Source = File(dic).readText()
+        var rg = ".*\t.*".toRegex()
+        var newText = ""
+        for (i in rg.findAll(Source)){
+            var arr = i.groups[0]?.value?.split("\t")
+            newText += "${arr!![1]};${arr!![0]}\n"
+        }
+        if (!newText.isEmpty()) {
+            File(dic).writeText(newText)
+            Toast.makeText(this, "Ready", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Not find text in file", Toast.LENGTH_SHORT).show()
+        }
+
+
     }
 }
