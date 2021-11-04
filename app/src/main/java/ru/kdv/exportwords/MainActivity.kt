@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d("db", c.getCount().toString())
                 var str=""
                 while(c.moveToNext()) {
-                    str += c.getString(c.getColumnIndex("question_ru")) + ";" + c.getString(c.getColumnIndex("question_en")) + ";" + c.getString(c.getColumnIndex("sentence_ru")) + ";" + c.getString(c.getColumnIndex("sentence_en"))+ ";" + c.getString(c.getColumnIndex("trans")) + "\n"
+                    str += c.getString(c.getColumnIndex("question_ru")) + ";" + c.getString(c.getColumnIndex("question_en")) + ";" + c.getString(c.getColumnIndex("sentence_ru")) + ";" + c.getString(c.getColumnIndex("sentence_en"))+ ";[" + c.getString(c.getColumnIndex("trans")) + "]\n"
                 }
                 var f = File(fn)
                 f.writeText(str)
@@ -101,7 +101,27 @@ class MainActivity : AppCompatActivity() {
         var newText = ""
         for (i in rg.findAll(Source)){
             var arr = i.groups[0]?.value?.split("\t")
-            newText += "${arr!![1]};${arr!![0]}\n"
+            var eng = arr!![0]
+            var ru = arr!![1]
+            var trans = "(?<=$eng ).*?\\]".toRegex().find(Source)!!.groups[0]!!.value
+            var exm_eng = ""
+
+            if (ru.contains(",")){
+                for (ru_word in ru.split(",")) {
+                    var find = "(?<=$ru_word \\().*?(?=\\))".toRegex().find(Source)
+                    if (find != null) {
+                        exm_eng += find!!.groups[0]!!.value + ","
+                    }
+                }
+            }else {
+                var find = "(?<=$ru \\().*?(?=\\))".toRegex().find(Source)
+                if (find != null) {
+                    exm_eng += find!!.groups[0]!!.value + ","
+                }
+            }
+
+            newText += "$ru;$eng;;$exm_eng;$trans\n"
+
         }
         if (!newText.isEmpty()) {
             File(dic).writeText(newText)
