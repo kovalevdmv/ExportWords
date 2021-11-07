@@ -62,14 +62,26 @@ class MainActivity : AppCompatActivity() {
                     ifnull(B.sentence_en,"") as sentence_en,
                     ifnull(transcription,"") as trans
                     from WordsTable as T
-                    left join BaseWordsTable as B
-                    on T.id_word = B.id_word
-                    where T.is_known = 0 and B.id_word is not null
-                    order by date_learned
+                        left join BaseWordsTable as B
+                        on T.id_word = B.id_word
+                    where T.is_known = 0 and B.id_word is not null 
+                    order by date_learned desc
+                    limit 100
                         """;
 
-                if(checkBox.isChecked){
-                    textQ = textQ.replace("T.is_known = 0 and","");
+                if(checkBox.isChecked) {
+                    textQ = textQ.replace("T.is_known = 0 and", "");
+                }
+
+                if (oldFirst.isChecked) {
+                    textQ = textQ.replace("date_learned desc", "date_learned");
+                }
+
+                if(numberStart.text.isEmpty()) {
+                    textQ = textQ.replace("limit 100", "");
+                }
+                else {
+                    textQ = textQ.replace("limit 100", "limit ${numberStart.text}");
                 }
 
                 var c = db.rawQuery(textQ, null)
