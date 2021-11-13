@@ -108,6 +108,11 @@ class MainActivity : AppCompatActivity() {
     fun onClickFromSmartBook(view: View) {
         var ExDir = externalMediaDirs[0].toString()
         var dic = ExDir + File.separator + "smart-book.txt"
+        if (!File(dic).exists()){
+            Toast.makeText(this, "Not found file smart-book.txt", Toast.LENGTH_SHORT).show()
+            return
+        }
+        var dic_new = ExDir + File.separator + "smart-book-export.txt"
         var Source = File(dic).readText()
         var rg = ".*\t.*".toRegex()
         var newText = ""
@@ -125,7 +130,7 @@ class MainActivity : AppCompatActivity() {
                         exm_eng += find!!.groups[0]!!.value + ","
                     }
                 }
-            }else {
+            } else {
                 var find = "(?<=$ru \\().*?(?=\\))".toRegex().find(Source)
                 if (find != null) {
                     exm_eng += find!!.groups[0]!!.value + ","
@@ -136,12 +141,12 @@ class MainActivity : AppCompatActivity() {
 
         }
         if (!newText.isEmpty()) {
-            File(dic).writeText(newText)
+            File(dic).delete()
+            File(dic_new).writeText(newText)
             Toast.makeText(this, "Ready", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(this, "Not find text in file", Toast.LENGTH_SHORT).show()
         }
-
 
     }
 }
